@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torrey Pines Waitlist Sniper</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0f0d;
+            --surface: #131a16;
+            --surface-2: #1a2420;
+            --border: #2a3a33;
+            --border-hover: #3a5a4a;
+            --green: #22c55e;
+            --green-dim: #16a34a;
+            --green-glow: rgba(34, 197, 94, 0.15);
+            --red: #ef4444;
+            --red-glow: rgba(239, 68, 68, 0.15);
+            --amber: #f59e0b;
+            --amber-glow: rgba(245, 158, 11, 0.15);
+            --text: #e8ede9;
+            --text-dim: #8a9b90;
+            --text-muted: #566b5e;
+            --font: 'DM Sans', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Background texture ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(34, 197, 94, 0.03) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(34, 197, 94, 0.02) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px 16px 100px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── Header ── */
+        .header {
+            text-align: center;
+            padding: 30px 0 10px;
+        }
+
+        .header-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text);
+        }
+
+        .header h1 span {
+            color: var(--green);
+        }
+
+        .header p {
+            color: var(--text-dim);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        /* ── Status bar ── */
+        .status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            padding: 10px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 12px;
+            font-family: var(--mono);
+        }
+
+        .status-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .status-bar .label { color: var(--text-dim); }
+        .status-bar .value { color: var(--text); font-weight: 500; }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title .icon { font-size: 16px; }
+
+        /* ── Form ── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-group.full { grid-column: 1 / -1; }
+
+        .form-group label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input,
+        .form-group select {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px var(--green-glow);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-group select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238a9b90' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
+
+        .form-group select option {
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            font-family: var(--font);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--green);
+            color: #000;
+        }
+        .btn-primary:hover {
+            background: #34d96f;
+            box-shadow: 0 0 20px var(--green-glow);
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: var(--red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .btn-danger:hover {
+            background: var(--red-glow);
+            border-color: var(--red);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-dim);
+            border: 1px solid var(--border);
+        }
+        .btn-outline:hover {
+            color: var(--text);
+            border-color: var(--border-hover);
+            background: rgba(255,255,255,0.03);
+        }
+
+        .btn-amber {
+            background: var(--amber);
+            color: #000;
+        }
+        .btn-amber:hover {
+            box-shadow: 0 0 20px var(--amber-glow);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .add-btn {
+            width: 100%;
+            margin-top: 16px;
+        }
+
+        /* ── Entry list ── */
+        .entry-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .entry-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 14px;
+            transition: border-color 0.2s;
+        }
+
+        .entry-item:hover {
+            border-color: var(--border-hover);
+        }
+
+        .entry-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .entry-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .entry-details {
+            font-size: 12px;
+            color: var(--text-dim);
+            font-family: var(--mono);
+        }
+
+        .entry-status {
+            font-size: 11px;
+            font-family: var(--mono);
+            font-weight: 500;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .status-ready { color: var(--green); background: var(--green-glow); }
+        .status-scheduled { color: var(--amber); background: var(--amber-glow); }
+        .status-running { color: #3b82f6; background: rgba(59, 130, 246, 0.15); }
+        .status-completed, .status-completed_placeholder { color: var(--green); background: var(--green-glow); }
+        .status-failed { color: var(--red); background: var(--red-glow); }
+
+        .entry-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+        .delete-btn:hover { color: var(--red); }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* ── Action panel ── */
+        .action-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .action-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .action-card:hover {
+            border-color: var(--border-hover);
+            background: var(--surface-2);
+        }
+
+        .action-card .action-icon { font-size: 24px; margin-bottom: 6px; }
+        .action-card .action-label { font-size: 13px; font-weight: 600; }
+        .action-card .action-desc {
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-top: 2px;
+        }
+
+        .action-card.run-now { border-color: var(--green-dim); }
+        .action-card.run-now:hover {
+            border-color: var(--green);
+            box-shadow: 0 0 30px var(--green-glow);
+        }
+
+        .action-card.schedule { border-color: rgba(245, 158, 11, 0.3); }
+        .action-card.schedule:hover {
+            border-color: var(--amber);
+            box-shadow: 0 0 30px var(--amber-glow);
+        }
+
+        /* ── Schedule info ── */
+        .schedule-info {
+            background: var(--amber-glow);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 12px;
+            font-family: var(--mono);
+            color: var(--amber);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .schedule-info .cancel-link {
+            color: var(--red);
+            cursor: pointer;
+            text-decoration: underline;
+            background: none;
+            border: none;
+            font-family: var(--mono);
+            font-size: 12px;
+        }
+
+        /* ── Log panel ── */
+        .log-panel {
+            max-height: 250px;
+            overflow-y: auto;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            font-family: var(--mono);
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        .log-panel::-webkit-scrollbar { width: 6px; }
+        .log-panel::-webkit-scrollbar-track { background: transparent; }
+        .log-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        .log-entry { color: var(--text-dim); }
+        .log-entry .time { color: var(--text-muted); }
+        .log-entry.error { color: var(--red); }
+        .log-entry.success { color: var(--green); }
+        .log-entry.info { color: var(--text-dim); }
+        .log-entry.started { color: #3b82f6; }
+
+        /* ── Responsive ── */
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .action-panel { grid-template-columns: 1fr; }
+            .status-bar { flex-wrap: wrap; gap: 8px; }
+        }
+
+        /* ── Time display ── */
+        .next-open {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text-dim);
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        .next-open strong {
+            color: var(--green);
+            font-weight: 600;
+        }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.success { border-color: var(--green); color: var(--green); }
+        .toast.error { border-color: var(--red); color: var(--red); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-icon">⛳</div>
+        <h1>Torrey Pines <span>Waitlist Sniper</span></h1>
+        <p>Automated waitlist entry — be first in line</p>
+        <div class="next-open" id="nextOpen"></div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-dot"></div>
+        <span class="label">Entries:</span>
+        <span class="value" id="statusCount">0</span>
+        <span class="label">│</span>
+        <span class="label">Next Run:</span>
+        <span class="value" id="statusNext">—</span>
+    </div>
+
+    <!-- Add Entry Form -->
+    <div class="card">
+        <div class="card-title"><span class="icon">+</span> Add Entry</div>
+        <form id="entryForm">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" id="firstName" placeholder="John" required>
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" id="lastName" placeholder="Doe" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" placeholder="john@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Cell Phone</label>
+                    <input type="tel" id="phone" placeholder="(858) 555-1234" required>
+                </div>
+                <div class="form-group">
+                    <label>Course</label>
+                    <select id="course">
+                        <option value="first_available">First Available</option>
+                        <option value="north">North Course</option>
+                        <option value="south">South Course</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Number of Players</label>
+                    <select id="players">
+                        <option value="1">1 Player</option>
+                        <option value="2">2 Players</option>
+                        <option value="3">3 Players</option>
+                        <option value="4" selected>4 Players</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary add-btn">+ Add to Queue</button>
+        </form>
+    </div>
+
+    <!-- Entries List -->
+    <div class="card">
+        <div class="card-title"><span class="icon">📋</span> Queue</div>
+        <div class="entry-list" id="entryList">
+            <div class="empty-state">No entries yet — add one above</div>
+        </div>
+    </div>
+
+    <!-- Action Panel -->
+    <div class="card">
+        <div class="card-title"><span class="icon">🚀</span> Launch</div>
+        <div class="action-panel">
+            <div class="action-card run-now" onclick="runNow()">
+                <div class="action-icon">⚡</div>
+                <div class="action-label">Run Now</div>
+                <div class="action-desc">Submit immediately</div>
+            </div>
+            <div class="action-card schedule" onclick="scheduleRun()">
+                <div class="action-icon">⏰</div>
+                <div class="action-label">Schedule</div>
+                <div class="action-desc" id="scheduleDesc">Next opening time</div>
+            </div>
+        </div>
+        <div id="scheduleInfoContainer"></div>
+    </div>
+
+    <!-- Logs -->
+    <div class="card">
+        <div class="card-title"><span class="icon">📡</span> Activity Log</div>
+        <div class="log-panel" id="logPanel">
+            <div class="log-entry"><span class="time">[system]</span> Waiting for action...</div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+    // ── Helpers ──
+    function toast(msg, type = 'success') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = `toast ${type} show`;
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    function getNextOpenTime() {
+        const now = new Date();
+        const pst = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+        const dow = pst.getDay(); // 0=Sun, 6=Sat
+
+        let hour, minute;
+        // Sat=6, Sun=0 → 3:30 AM; Mon-Fri → 4:30 AM
+        if (dow === 6 || dow === 0) {
+            hour = 3; minute = 30;
+        } else {
+            hour = 4; minute = 30;
+        }
+
+        let next = new Date(pst);
+        next.setHours(hour, minute, 0, 0);
+
+        if (next <= pst) {
+            next.setDate(next.getDate() + 1);
+            const nextDow = next.getDay();
+            if (nextDow === 6 || nextDow === 0) {
+                next.setHours(3, 30, 0, 0);
+            } else {
+                next.setHours(4, 30, 0, 0);
+            }
+        }
+
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const dayName = days[next.getDay()];
+        const timeStr = next.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        return `${dayName} @ ${timeStr} PT`;
+    }
+
+    document.getElementById('nextOpen').innerHTML = `Next opening: <strong>${getNextOpenTime()}</strong>`;
+    document.getElementById('scheduleDesc').textContent = getNextOpenTime();
+
+    // ── API calls ──
+    async function loadEntries() {
+        const res = await fetch('/api/entries');
+        const data = await res.json();
+        renderEntries(data);
+    }
+
+    async function loadStatus() {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        document.getElementById('statusCount').textContent = data.total_entries;
+        document.getElementById('statusNext').textContent = data.next_scheduled_run || '—';
+
+        if (data.next_scheduled_run) {
+            document.getElementById('scheduleInfoContainer').innerHTML = `
+                <div class="schedule-info">
+                    <span>⏰ Scheduled: ${data.next_scheduled_run}</span>
+                    <button class="cancel-link" onclick="cancelSchedule()">Cancel</button>
+                </div>
+            `;
+        } else {
+            document.getElementById('scheduleInfoContainer').innerHTML = '';
+        }
+    }
+
+    function renderEntries(data) {
+        const list = document.getElementById('entryList');
+        if (data.length === 0) {
+            list.innerHTML = '<div class="empty-state">No entries yet — add one above</div>';
+            return;
+        }
+
+        list.innerHTML = data.map(e => `
+            <div class="entry-item">
+                <div class="entry-info">
+                    <div class="entry-name">${e.first_name} ${e.last_name}</div>
+                    <div class="entry-details">${e.course} · ${e.players}p · ${e.phone}</div>
+                </div>
+                <div class="entry-actions">
+                    <span class="entry-status status-${e.status}">${e.status}</span>
+                    <button class="delete-btn" onclick="deleteEntry('${e.id}')" title="Remove">✕</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // ── Form submit ──
+    document.getElementById('entryForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const body = {
+            first_name: document.getElementById('firstName').value.trim(),
+            last_name: document.getElementById('lastName').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            phone: document.getElementById('phone').value.trim(),
+            course: document.getElementById('course').value,
+            players: document.getElementById('players').value,
+        };
+
+        const res = await fetch('/api/entries', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+
+        if (res.ok) {
+            toast(`${body.first_name} added to queue`);
+            document.getElementById('entryForm').reset();
+            document.getElementById('players').value = '4'; // Reset default
+            loadEntries();
+            loadStatus();
+        } else {
+            toast('Failed to add entry', 'error');
+        }
+    });
+
+    async function deleteEntry(id) {
+        await fetch(`/api/entries/${id}`, { method: 'DELETE' });
+        toast('Entry removed');
+        loadEntries();
+        loadStatus();
+    }
+
+    async function runNow() {
+        const res = await fetch('/api/run-now', { method: 'POST' });
+        const data = await res.json();
+        if (res.ok) {
+            toast(`🚀 ${data.message}`);
+            loadEntries();
+            loadStatus();
+            startLogPolling();
+        } else {
+            toast(data.error, 'error');
+        }
+    }
+
+    async function scheduleRun() {
+        const res = await fetch('/api/schedule', { method: 'POST' });
+        const data = await res.json();
+        if (res.ok) {
+            toast(`⏰ ${data.message} for ${data.run_time}`);
+            loadEntries();
+            loadStatus();
+        } else {
+            toast(data.error, 'error');
+        }
+    }
+
+    async function cancelSchedule() {
+        const res = await fetch('/api/cancel-schedule', { method: 'POST' });
+        const data = await res.json();
+        toast(data.message);
+        loadEntries();
+        loadStatus();
+    }
+
+    // ── Log polling ──
+    let logInterval = null;
+    function startLogPolling() {
+        if (logInterval) return;
+        logInterval = setInterval(loadLogs, 2000);
+        setTimeout(() => {
+            clearInterval(logInterval);
+            logInterval = null;
+        }, 120000); // Stop after 2 min
+    }
+
+    async function loadLogs() {
+        const res = await fetch('/api/logs');
+        const data = await res.json();
+        const panel = document.getElementById('logPanel');
+
+        if (data.length === 0) return;
+
+        panel.innerHTML = data.map(l => `
+            <div class="log-entry ${l.status}">
+                <span class="time">[${l.timestamp}]</span> ${l.message}
+            </div>
+        `).join('');
+
+        panel.scrollTop = panel.scrollHeight;
+        loadEntries();
+        loadStatus();
+    }
+
+    // ── Init ──
+    loadEntries();
+    loadStatus();
+    setInterval(loadStatus, 30000);
+</script>
+
+</body>
+</html>
